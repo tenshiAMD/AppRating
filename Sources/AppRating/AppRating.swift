@@ -342,7 +342,7 @@ open class AppRatingManager : NSObject {
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var ratingAlert: UIAlertController? = nil
     #endif
-    fileprivate let reviewURLTemplate  = "https://itunes.apple.com/app/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
+    fileprivate let reviewURLTemplate  = "https://apps.apple.com/app/APP_NAME/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
     
     // MARK: -
     // MARK: Initialization
@@ -770,6 +770,7 @@ open class AppRatingManager : NSObject {
     fileprivate func reviewURLString() -> String {
         let template = reviewURLTemplate
         var reviewURL = template.replacingOccurrences(of: "APP_ID", with: "\(appID)")
+        reviewURL = reviewURL.replacingOccurrences(of: "APP_NAME", with: "\(appName)")
         reviewURL = reviewURL.replacingOccurrences(of: "AFFILIATE_CODE", with: "\(affiliateCode)")
         reviewURL = reviewURL.replacingOccurrences(of: "AFFILIATE_CAMPAIGN_CODE", with: "\(affiliateCampaignCode)")
         debugLog(reviewURL)
