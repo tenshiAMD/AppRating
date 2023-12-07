@@ -342,7 +342,7 @@ open class AppRatingManager : NSObject {
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var ratingAlert: UIAlertController? = nil
     #endif
-    fileprivate let reviewURLTemplate  = "https://apps.apple.com/app/APP_NAME/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
+    fileprivate let reviewURLTemplate  = "https://apps.apple.com/app/APP_NAME/idAPP_ID?action=write-review"
     
     // MARK: -
     // MARK: Initialization
@@ -761,18 +761,10 @@ open class AppRatingManager : NSObject {
     // MARK: -
     // MARK: PRIVATE Misc Settings
     
-    // If you aren't going to set an affiliate code yourself, please leave this as is.
-    // It is my affiliate code. It is better that somebody's code is used rather than nobody's.
-    
-    fileprivate var affiliateCode: String                   = "1000ldjv"
-    fileprivate var affiliateCampaignCode: String           = "AppRating"
-    
     fileprivate func reviewURLString() -> String {
         let template = reviewURLTemplate
         var reviewURL = template.replacingOccurrences(of: "APP_ID", with: "\(appID)")
         reviewURL = reviewURL.replacingOccurrences(of: "APP_NAME", with: "\(appName)")
-        reviewURL = reviewURL.replacingOccurrences(of: "AFFILIATE_CODE", with: "\(affiliateCode)")
-        reviewURL = reviewURL.replacingOccurrences(of: "AFFILIATE_CAMPAIGN_CODE", with: "\(affiliateCampaignCode)")
         debugLog(reviewURL)
         return reviewURL
     }
