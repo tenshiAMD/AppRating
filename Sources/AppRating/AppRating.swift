@@ -25,6 +25,7 @@
 import Foundation
 import StoreKit
 import SystemConfiguration
+import Cosmos
 
 #if canImport(UIKit)
     import UIKit
@@ -335,12 +336,14 @@ open class AppRatingManager : NSObject {
     @objc public var didDeclineToRateClosure: AppRatingClosure?
     @objc public var didOptToRateClosure: AppRatingClosure?
     @objc public var didOptToRemindLaterClosure: AppRatingClosure?
+    @objc public var didFinishTouchingCosmos: ((Double)->())?
     
     fileprivate var userDefaultsObject = UserDefaults.standard;
     fileprivate var currentVersion = "0.0.0";
     #if canImport(UIKit)
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var ratingAlert: UIAlertController? = nil
+    fileprivate var ratingView: CosmosView = CosmosView()
     #endif
     fileprivate let reviewURLTemplate  = "https://apps.apple.com/app/APP_NAME/idAPP_ID?action=write-review"
     
@@ -397,7 +400,7 @@ open class AppRatingManager : NSObject {
                 }
             } else {
                 if (self.ratingAlert == nil) {
-                    let alertView : UIAlertController = UIAlertController(title: self.defaultReviewTitle(), message: self.defaultReviewMessage(), preferredStyle: UIAlertController.Style.alert)
+                    let alertView : UIAlertController = UIAlertController(title: self.defaultReviewTitle(), message: "\(self.defaultReviewMessage())\n\n", preferredStyle: UIAlertController.Style.alert)
                     alertView.addAction(UIAlertAction(title: self.defaultCancelButtonTitle(), style:UIAlertAction.Style.cancel, handler: {
                         (alert: UIAlertAction!) in
                         self.dontRate();
@@ -428,6 +431,27 @@ open class AppRatingManager : NSObject {
                         // note that tint color has to be set after the controller is presented in order to take effect (last checked in iOS 9.3)
                         alertView.view.tintColor = self.tintColor
                     }
+                        
+                    let customView = UIView(frame: CGRect(x: 0, y: 0, width: 270.0, height: 160.0))
+                    
+                    self.ratingView.rating = 0.0
+                    self.ratingView.settings.starSize = 30
+                    self.ratingView.settings.emptyBorderColor = UIColor.gray
+                    self.ratingView.settings.updateOnTouch = true
+                    self.ratingView.frame = CGRectMake(0, 0, 200.0, 60.0)
+                    
+                    let xCoord = alertView.view.frame.width / CGFloat(self.ratingView.settings.totalStars) - (self.ratingView.settings.starSize + 5)
+                    let yCoord = CGFloat(self.ratingView.settings.starSize * Double(self.ratingView.settings.totalStars - 1))
+                    self.ratingView.frame.origin.x = xCoord
+                    self.ratingView.frame.origin.y = yCoord
+                    
+                    if let closure = self.didFinishTouchingCosmos {
+                        self.ratingView.didFinishTouchingCosmos = closure
+                    }
+                    
+                    customView.addSubview(self.ratingView)
+                    alertView.view.addSubview(customView)
+
                     self.ratingAlert = alertView;
                 }
             }
