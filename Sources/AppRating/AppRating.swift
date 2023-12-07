@@ -327,6 +327,7 @@ open class AppRatingManager : NSObject {
     @objc public var useSKStoreReviewController : Bool = true;
     @objc public var ratingConditionsAlwaysTrue: Bool = false;
     @objc public var debugEnabled : Bool = false;
+    @objc public var opensReviewViaURL : Bool = true;
     
     // MARK: -
     // MARK: Optional Closures
@@ -374,17 +375,19 @@ open class AppRatingManager : NSObject {
     fileprivate func rateApp() {
         #if canImport(UIKit)
         self.setUserHasRatedApp();
-        if (defaultOpensInStoreKit()) {
-            if #available(iOS 10.3, *) {
-                UIApplication.shared.open(URL(string: reviewURLString())!, options: [:], completionHandler: nil);
+        if (self.opensReviewViaURL) {
+            if (defaultOpensInStoreKit()) {
+                if #available(iOS 10.3, *) {
+                    UIApplication.shared.open(URL(string: reviewURLString())!, options: [:], completionHandler: nil);
+                } else {
+                    UIApplication.shared.openURL(URL(string: reviewURLString())!)
+                }
             } else {
-               UIApplication.shared.openURL(URL(string: reviewURLString())!)
-            }
-        } else {
-            if #available(iOS 10.3, *) {
-                UIApplication.shared.open(URL(string: reviewURLString())!, options: [:], completionHandler: nil);
-            } else {
-                UIApplication.shared.openURL(URL(string: reviewURLString())!)
+                if #available(iOS 10.3, *) {
+                    UIApplication.shared.open(URL(string: reviewURLString())!, options: [:], completionHandler: nil);
+                } else {
+                    UIApplication.shared.openURL(URL(string: reviewURLString())!)
+                }
             }
         }
         #endif
